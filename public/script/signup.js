@@ -23,4 +23,5 @@ signupBtn.addEventListener('click',()=>{
             img_url: image.value
         })
     })
+    .catch(err => console.log(err))
 })
