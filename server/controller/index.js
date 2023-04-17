@@ -5,6 +5,8 @@ const users = require('./users')
 const router  = express.Router()
 
 router.post('/signup', users.addUser)
+router.post('/login', users.login)
+
 router.use(errHandling)
 
 
