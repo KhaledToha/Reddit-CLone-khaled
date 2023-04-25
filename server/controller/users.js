@@ -22,11 +22,12 @@ exports.addUser = (req, res, next) => {
             userData = data.rows[0]
             return jwtSign(data.rows[0])
         })
-        .then(result => res.cookie('token', result).json({
-            error: false,
-            message: 'User Created Successfully',
-            data: userData
-        }))
+        .then(result => {
+            res.cookie('token', result)
+            res.redirect(301, '/')
+        }
+
+        )
         .catch((err) => {
             if(err.isJoi){
                 next(new CustomError(400, err.details))
@@ -60,11 +61,15 @@ exports.login = (req,res,next) =>{
         userData = data.rows[0]
        return jwtSign(userData)
     }).then((token)=>{
-        res.cookie('token', token, { path : '/'}).json({
-            error: false,
-            message: 'User Logged In Successfully',
-            data : userData
-        })
+        // res.cookie('token', token, { path : '/'}).json({
+        //     error: false,
+        //     message: 'User Logged In Successfully',
+        //     data : userData
+    // })
+
+        res.cookie('token', token, { path: '/', httpOnly: true})
+        return res.redirect(301, '/')
+        
     })
     .catch((err)=>{
         if(err.isJoi){

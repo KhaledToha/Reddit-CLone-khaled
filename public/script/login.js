@@ -15,6 +15,8 @@ loginBtn.addEventListener('click',()=>{
         
         
     })
-    // .then(window.location.replace('http://localhost:4000'))
+     .then(response => {if(response.ok){
+        window.location.href = '/'
+     }})
     .catch(err => console.log(err))
 })

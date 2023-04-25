@@ -23,12 +23,20 @@ CREATE TABLE posts (
     title TEXT NOT NULL,
     description TEXT,
     post_img Text NOT NULL,
-    post_date DATE NOT NULL
+    post_date TIMESTAMP DEFAULT now()
 );
 
 INSERT INTO posts (user_id, title,description,   post_date, post_img) VALUES 
 (1, 'HELLO','hello from the first post', '2023-04-05', 'https://images.unsplash.com/photo-1668936132135-f2844ef1735b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8fHx8fHx8MTY4MDc2ODQ0Mg&ixlib=rb-4.0.3&q=80&w=1080');
 
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    post_id INTEGER REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    comment_data TIMESTAMP DEFAULT now()
+);
 
+INSERT INTO comments (user_id, post_id, content) VALUES (1, 1, 'WoW very nice');
 
 COMMIT;

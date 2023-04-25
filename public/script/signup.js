@@ -22,6 +22,10 @@ signupBtn.addEventListener('click',()=>{
             type: 'user',
             img_url: image.value
         })
+    }).then(response => {
+        if(response.ok){
+            window.location.href = '/'
+        }
     })
     .catch(err => console.log(err))
 })

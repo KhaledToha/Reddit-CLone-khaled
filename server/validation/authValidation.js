@@ -10,7 +10,7 @@ exports.SignUpSchema = Joi.object({
     password: Joi.string().pattern(new RegExp('[a-zA-Z0-9]{6,30}$')),
     confirmPassword: Joi.ref('password'),
     type: Joi.string().valid('admin','user'),
-    phone: Joi.string().pattern(new RegExp('059{1}[9528]{1}[0-9]{6}')),
+    phone: Joi.string().pattern(new RegExp('059{1}[95287]{1}[0-9]{6}')),
     img_url: Joi.string()
 })
 
