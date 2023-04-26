@@ -13,3 +13,7 @@ exports.loginQuery = (email) => {
 exports.getUserByEmailQuery = (email) => {
     return connection.query('SELECT id, name, email, role, img_url FROM users WHERE email = $1', [email])
 }
+
+exports.getUserByIdQuery = (user_id)=>{
+    return connection.query('SELECT * FROM users WHERE id = $1',[user_id])
+}

@@ -81,3 +81,15 @@ exports.login = (req,res,next) =>{
     })
 
 }
+
+exports.getUserById = (req,res,next)=>{
+    usersQuery.getUserByIdQuery(req.params.id)
+    .then(data => {
+        res.status(200).json({
+            error:false,
+            message: 'Fetch user data',
+            data: data.rows[0]
+        })
+    })
+    .catch(err => next(new CustomError(500, err)))
+}

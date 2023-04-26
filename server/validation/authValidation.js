@@ -4,7 +4,7 @@ const Joi = require('joi');
 exports.SignUpSchema = Joi.object({
 
 
-    name: Joi.string().alphanum().required().min(3).max(7),
+    name: Joi.string().alphanum().required().min(3).max(50),
     email: Joi.string()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }),
     password: Joi.string().pattern(new RegExp('[a-zA-Z0-9]{6,30}$')),

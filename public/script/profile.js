@@ -1,53 +1,17 @@
+const urlParams = new URLSearchParams(window.location.search);
+const userId = urlParams.get('id')
 const content = document.querySelector('#content')
-const postModal = document.querySelector('#post-modal')
+const userAvatar = document.querySelector('#user-avatar')
+const userName = document.querySelector('#user-name')
+const userEmail = document.querySelector('#user-email')
 
-const closePostModal = document.querySelector('.close')
-
-const postTitle = document.querySelector('#post-modal #title')
-const postDescription = document.querySelector('#post-modal #description')
-const postImage = document.querySelector('#post-modal #image-url')
-const addPostBtn = document.querySelector('#post-modal #add-post-btn')
-
-
-closePostModal.addEventListener('click', () => {
-    postModal.style.display = 'none'
+fetch(`/users${userId}`)
+.then(data => data.json())
+.then(data => {
+    userAvatar.setAttribute('src', data.data.img_url)
+    userName.textContent = data.data.name
+    userEmail.textContent = data.data.email
 })
-
-
-function renderAddPost(user) {
-
-
-    const addPost = document.createElement('div');
-    addPost.classList.add('add-post');
-
-    const avatar = document.createElement('div');
-    avatar.classList.add('avatar');
-    const avatarImg = document.createElement('img');
-    avatarImg.src = user.img_url;
-    avatarImg.alt = 'Avatar';
-    avatar.appendChild(avatarImg);
-
-    const form = document.createElement('form');
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = 'Create Post';
-
-    input.addEventListener('click', () => {
-        postModal.style.display = 'initial'
-    })
-
-    form.appendChild(input);
-
-    addPost.appendChild(avatar);
-    addPost.appendChild(form);
-
-
-
-    document.body.insertBefore(addPost, content);
-}
-
-
-
 
 function renderPost(post) {
     const postBlock = document.createElement('div')
@@ -74,7 +38,7 @@ function renderPost(post) {
     const userDate = document.createElement('div')
 
     const userLink = document.createElement('a')
-    userLink.setAttribute('href',`./pages/profile.html?id=${post.user_id}`)
+    userLink.setAttribute('href',`./profile.html?id=${post.user_id}`)
 
     const userName = document.createElement('h5')
     userName.classList.add('mb-0')
@@ -391,7 +355,7 @@ function renderComments(comment) {
     
 
     const userName = document.createElement('a')
-    userName.setAttribute('href', `./pages/profile.html?id=${comment.id}`)
+    userName.setAttribute('href', `./profile.html?id=${comment.id}`)
     userName.classList.add('text-dark')
     userName.textContent = comment.name
 
@@ -417,41 +381,10 @@ function renderComments(comment) {
 
 }
 
+fetch(`/profile/post${userId}`)
+.then(data => data.json())
+.then(data => {
+    content.textContent = ''
+    data.data.forEach(post => content.appendChild(renderPost(post)))
+})
 
-
-
-fetch('/home')
-    .then(result => result.json())
-    .then((result) => {
-        //content.textContent = '';
-        if (result.user) {
-            renderAddPost(result.user)
-        }
-        result.data.forEach(post => content.appendChild(renderPost(post)))
-    })
-    .catch(err => console.log(err))
-
-
-
-
-addPostBtn.addEventListener('click', async () => {
-    try {
-        const response = await fetch('/post', {
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                title: postTitle.value,
-                description: postDescription.value,
-                post_img: postImage.value
-            })
-        });
-
-        const data = await response.json();
-        content.appendChild(renderPost(data.data));
-        postModal.style.display = 'none';
-    } catch (err) {
-        console.log(err);
-    }
-});
