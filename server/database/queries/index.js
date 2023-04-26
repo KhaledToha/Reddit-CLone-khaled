@@ -1,5 +1,11 @@
-const { addUserQuery } = require('./users')
+const users = require('./users')
+const posts = require('./posts')
+const comments = require('./comments')
+const votes = require('./votes')
 
 module.exports = {
-    addUserQuery
+    users,
+    posts,
+    comments,
+    votes
 }

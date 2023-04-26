@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser')
 
 const { join } = require('path')
 
-const router = require('./controller/index')
+const router = require('./routers/router')
 
 const app = express()
 

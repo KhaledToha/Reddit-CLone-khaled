@@ -8,17 +8,44 @@ const postDescription = document.querySelector('#post-modal #description')
 const postImage = document.querySelector('#post-modal #image-url')
 const addPostBtn = document.querySelector('#post-modal #add-post-btn')
 
+const loginButton = document.querySelector('#login-button')
+const navContainer = document.querySelector('.container')
+
 
 closePostModal.addEventListener('click', () => {
     postModal.style.display = 'none'
 })
 
 
+function renderUser(user){
+    const userDiv = document.createElement('div')
+    userDiv.classList.add('d-flex')
+    userDiv.classList.add('align-items-center')
+
+    const userImg = document.createElement('img')
+    userImg.classList.add('rounded-circle')
+    userImg.classList.add('mr-3')
+    userImg.setAttribute('width', '75')
+    userImg.setAttribute('height', '75')
+    userImg.setAttribute('src', user.img_url)
+
+    const userName = document.createElement('h6')
+    userName.classList.add('text-white')
+    userName.textContent = user.name
+
+    userDiv.appendChild(userImg)
+    userDiv.appendChild(userName)
+
+    return userDiv
+}
+
 function renderAddPost(user) {
 
 
     const addPost = document.createElement('div');
     addPost.classList.add('add-post');
+    addPost.classList.add('col-sm-6')
+    addPost.classList.add('offset-sm-3')
 
     const avatar = document.createElement('div');
     avatar.classList.add('avatar');
@@ -102,12 +129,16 @@ function renderPost(post) {
     postContent.classList.add('post-block__content')
     postContent.classList.add('mb-2')
 
+    const postTitle = document.createElement('h5')
+    postTitle.textContent = post.title
+
     const postDesc = document.createElement('p')
     postDesc.textContent = post.description
 
     const postImg = document.createElement('img')
     postImg.setAttribute('src', post.post_img)
 
+    postContent.appendChild(postTitle)
     postContent.appendChild(postDesc)
     postContent.appendChild(postImg)
 
@@ -251,13 +282,19 @@ function renderPost(post) {
                             post_id: post.id,
                             value: 1
                         })
-                    }).then(data => {
+                        
+                    }).then(data => data.json())
+                    .then(data => {
+                        if(data.error){
+                            alert('You need to login')
+                        }
                         window.location.reload()
                         // votesCount.textContent++
-                        // window.location.reload()
+                        // //window.location.reload()
                         // voteUpSpan.innerHtml = ''
                         // voteUpSpan.innerHtml = '<i class="fa-solid fa-thumbs-up"></i>'
                     })
+                    
                 })
 
                 voteDownSpan.addEventListener('click', () => {
@@ -270,13 +307,19 @@ function renderPost(post) {
                             post_id: post.id,
                             value: -1
                         })
-                    }).then(data => {
-                        window.location.reload()
-                        // votesCount.textContent++
-                        // window.location.reload()
-                        // voteUpSpan.innerHtml = ''
-                        // voteUpSpan.innerHtml = '<i class="fa-solid fa-thumbs-up"></i>'
                     })
+                    .then(data => data.json())
+                    .then(data => {
+                        if(data.error){
+                            alert('You need to login')
+                        }
+                        window.location.reload()
+                        // votesCount.textContent-2
+                        // //window.location.reload()
+                        // voteDownSpan.innerHtml = ''
+                        // voteUpSpan.innerHtml = '<i class="fa-solid fa-thumbs-down"></i>'
+                    })
+                    
                 })
             }
 
@@ -313,7 +356,7 @@ function renderPost(post) {
 
     const addCommentBtn = document.createElement('button')
     addCommentBtn.classList.add('btn')
-    addCommentBtn.classList.add('btn-primary')
+    addCommentBtn.classList.add('btn-custom')
     addCommentBtn.setAttribute('type', 'button')
     addCommentBtn.setAttribute('id', 'button-addon2')
     addCommentBtn.innerHTML = '<i class="fa fa-paper-plane"></i>'
@@ -384,6 +427,8 @@ function renderComments(comment) {
     userImg.classList.add('mr-2')
 
     const userNameDateDiv = document.createElement('div')
+    userNameDateDiv.classList.add('bg-light')
+    userNameDateDiv.classList.add('comment-body')
 
     const userNameDate = document.createElement('h6')
     userNameDate.classList.add('mb-1')
@@ -426,6 +471,10 @@ fetch('/home')
         //content.textContent = '';
         if (result.user) {
             renderAddPost(result.user)
+            if (loginButton) {
+                loginButton.parentNode.removeChild(loginButton);
+                navContainer.appendChild(renderUser(result.user))
+              }
         }
         result.data.forEach(post => content.appendChild(renderPost(post)))
     })

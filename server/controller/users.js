@@ -1,5 +1,5 @@
 
-const usersQuery = require('../database/queries/users')
+const { users } = require('../database/queries/index')
 const CustomError = require('../helper/customError')
 const { jwtSign } = require('../helper/jwtSign')
 const { SignUpSchema } = require('../validation/authValidation')
@@ -16,15 +16,18 @@ exports.addUser = (req, res, next) => {
 
         .then((hashedPass) => {
             req.body.password = hashedPass
-            return usersQuery.addUserQuery(req.body)
+            return users.addUserQuery(req.body)
         })
         .then(data => {
             userData = data.rows[0]
             return jwtSign(data.rows[0])
         })
-        .then(result => {
-            res.cookie('token', result)
-            res.redirect(301, '/')
+        .then(token => {
+            res.cookie('token', token, { path : '/'}).json({
+                error: false,
+                message: 'User Logged In Successfully',
+                data : userData
+        })
         }
 
         )
@@ -45,7 +48,7 @@ exports.login = (req,res,next) =>{
     let userData;
 
     LoginSchema.validateAsync(req.body)
-    .then(value => usersQuery.loginQuery(email))
+    .then(value => users.loginQuery(email))
     .then((data) => {
         if(data.rows.length == 0) {
             next(new CustomError(400, 'This Email Dosn\'t Exsists'))
@@ -56,19 +59,19 @@ exports.login = (req,res,next) =>{
         if (result === false){
             next(new CustomError(400, 'Wrong Password'))
         }
-        return usersQuery.getUserByEmailQuery(email)
+        return users.getUserByEmailQuery(email)
     }).then((data)=>{
         userData = data.rows[0]
        return jwtSign(userData)
     }).then((token)=>{
-        // res.cookie('token', token, { path : '/'}).json({
-        //     error: false,
-        //     message: 'User Logged In Successfully',
-        //     data : userData
-    // })
+        res.cookie('token', token, { path : '/'}).json({
+            error: false,
+            message: 'User Logged In Successfully',
+            data : userData
+    })
 
-        res.cookie('token', token, { path: '/', httpOnly: true})
-        return res.redirect(301, '/')
+        // res.cookie('token', token, { path: '/', httpOnly: true})
+        // return res.redirect(301, '/')
         
     })
     .catch((err)=>{
@@ -83,7 +86,7 @@ exports.login = (req,res,next) =>{
 }
 
 exports.getUserById = (req,res,next)=>{
-    usersQuery.getUserByIdQuery(req.params.id)
+    users.getUserByIdQuery(req.params.id)
     .then(data => {
         res.status(200).json({
             error:false,
