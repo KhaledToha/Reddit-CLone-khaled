@@ -5,13 +5,38 @@ const userAvatar = document.querySelector('#user-avatar')
 const userName = document.querySelector('#user-name')
 const userEmail = document.querySelector('#user-email')
 
+const loginButton = document.querySelector('#login-button')
+const navContainer = document.querySelector('.container')
+
 fetch(`/users${userId}`)
-.then(data => data.json())
-.then(data => {
-    userAvatar.setAttribute('src', data.data.img_url)
-    userName.textContent = data.data.name
-    userEmail.textContent = data.data.email
-})
+    .then(data => data.json())
+    .then(data => {
+        userAvatar.setAttribute('src', data.data.img_url)
+        userName.textContent = data.data.name
+        userEmail.textContent = data.data.email
+    })
+
+function renderUser(user) {
+    const userDiv = document.createElement('div')
+    userDiv.classList.add('d-flex')
+    userDiv.classList.add('align-items-center')
+
+    const userImg = document.createElement('img')
+    userImg.classList.add('rounded-circle')
+    userImg.classList.add('mr-3')
+    userImg.setAttribute('width', '75')
+    userImg.setAttribute('height', '75')
+    userImg.setAttribute('src', user.img_url)
+
+    const userName = document.createElement('h6')
+    userName.classList.add('text-white')
+    userName.textContent = user.name
+
+    userDiv.appendChild(userImg)
+    userDiv.appendChild(userName)
+
+    return userDiv
+}
 
 function renderPost(post) {
     const postBlock = document.createElement('div')
@@ -38,7 +63,7 @@ function renderPost(post) {
     const userDate = document.createElement('div')
 
     const userLink = document.createElement('a')
-    userLink.setAttribute('href',`./profile.html?id=${post.user_id}`)
+    userLink.setAttribute('href', `./profile.html?id=${post.user_id}`)
 
     const userName = document.createElement('h5')
     userName.classList.add('mb-0')
@@ -66,12 +91,16 @@ function renderPost(post) {
     postContent.classList.add('post-block__content')
     postContent.classList.add('mb-2')
 
+    const postTitle = document.createElement('h5')
+    postTitle.textContent = post.title
+
     const postDesc = document.createElement('p')
     postDesc.textContent = post.description
 
     const postImg = document.createElement('img')
     postImg.setAttribute('src', post.post_img)
 
+    postContent.appendChild(postTitle)
     postContent.appendChild(postDesc)
     postContent.appendChild(postImg)
 
@@ -111,7 +140,7 @@ function renderPost(post) {
     let votedUp = false;
     let votedDown = false;
 
-    
+
 
     fetch(`/userVotes${post.id}`)
         .then(data => data.json())
@@ -202,14 +231,14 @@ function renderPost(post) {
                             })
                     })
 
-                    
-                } 
-            }else {
+
+                }
+            } else {
                 voteUpSpan.addEventListener('click', () => {
                     fetch('/votes', {
                         method: 'POST',
-                        headers:{
-                            'Content-type':'application/json'
+                        headers: {
+                            'Content-type': 'application/json'
                         },
                         body: JSON.stringify({
                             post_id: post.id,
@@ -227,8 +256,8 @@ function renderPost(post) {
                 voteDownSpan.addEventListener('click', () => {
                     fetch('/votes', {
                         method: 'POST',
-                        headers:{
-                            'Content-type':'application/json'
+                        headers: {
+                            'Content-type': 'application/json'
                         },
                         body: JSON.stringify({
                             post_id: post.id,
@@ -277,7 +306,7 @@ function renderPost(post) {
 
     const addCommentBtn = document.createElement('button')
     addCommentBtn.classList.add('btn')
-    addCommentBtn.classList.add('btn-primary')
+    addCommentBtn.classList.add('btn-custom')
     addCommentBtn.setAttribute('type', 'button')
     addCommentBtn.setAttribute('id', 'button-addon2')
     addCommentBtn.innerHTML = '<i class="fa fa-paper-plane"></i>'
@@ -348,11 +377,13 @@ function renderComments(comment) {
     userImg.classList.add('mr-2')
 
     const userNameDateDiv = document.createElement('div')
+    userNameDateDiv.classList.add('bg-light')
+    userNameDateDiv.classList.add('comment-body')
 
     const userNameDate = document.createElement('h6')
     userNameDate.classList.add('mb-1')
 
-    
+
 
     const userName = document.createElement('a')
     userName.setAttribute('href', `./profile.html?id=${comment.id}`)
@@ -382,9 +413,13 @@ function renderComments(comment) {
 }
 
 fetch(`/profile/post${userId}`)
-.then(data => data.json())
-.then(data => {
-    content.textContent = ''
-    data.data.forEach(post => content.appendChild(renderPost(post)))
-})
+    .then(data => data.json())
+    .then(data => {
+        if (data.user) {
+            loginButton.parentNode.removeChild(loginButton);
+            navContainer.appendChild(renderUser(data.user))
+        }
+        content.textContent = ''
+        data.data.forEach(post => content.appendChild(renderPost(post)))
+    })
 

@@ -1,4 +1,4 @@
-const comments = require('../database/queries/comments')
+const { comments } = require('../database/queries/index')
 const CustomError = require('../helper/customError')
 
 exports.getCommentsByPostId = (req,res,next)=> {

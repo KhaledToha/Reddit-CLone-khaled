@@ -1,4 +1,4 @@
-const votes = require('../database/queries/votes')
+const { votes } = require('../database/queries/index')
 const CustomError = require('../helper/customError')
 
 exports.getVotes = (req, res, next) => {

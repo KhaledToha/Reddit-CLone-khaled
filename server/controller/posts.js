@@ -1,5 +1,5 @@
 const { json } = require('express')
-const posts = require('../database/queries/posts')
+const { posts } = require('../database/queries/index')
 const CustomError = require('../helper/customError')
 
 exports.getAllPosts = (req,res,next)=>{
@@ -45,7 +45,8 @@ exports.getPostByUserId = (req,res,next)=>{
         res.status(200).json({
             error: false,
             message: 'Fetch user posts',
-            data: data.rows
+            data: data.rows,
+            user:req.userData
         })
     })
     .catch(err => next(new CustomError(500, err)))
