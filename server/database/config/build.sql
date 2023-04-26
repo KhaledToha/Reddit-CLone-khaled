@@ -1,6 +1,6 @@
 BEGIN;
 
-DROP TABLE IF EXISTS users, posts;
+DROP TABLE IF EXISTS users, posts, comments, votes;
 
 CREATE TABLE users (
     id SERIAL PRIMARY KEY ,
@@ -38,5 +38,14 @@ CREATE TABLE comments (
 );
 
 INSERT INTO comments (user_id, post_id, content) VALUES (1, 1, 'WoW very nice');
+
+CREATE TABLE votes (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    post_id INTEGER REFERENCES posts(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    value  INTEGER NOT NULL
+);
+
+INSERT INTO votes (user_id, post_id, value) VALUES (1, 1, 1);
 
 COMMIT;

@@ -38,3 +38,15 @@ exports.addPost = (req,res,next)=>{
         return
     })
 }
+
+exports.getPostByUserId = (req,res,next)=>{
+    posts.getPostsByUserIdQuery(req.params.id)
+    .then(data => {
+        res.status(200).json({
+            error: false,
+            message: 'Fetch user posts',
+            data: data.rows
+        })
+    })
+    .catch(err => next(new CustomError(500, err)))
+}
