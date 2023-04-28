@@ -14,8 +14,16 @@ exports.getVotes = (req, res, next) => {
 }
 
 exports.getUserVoteByPostId = (req, res, next) => {
+    if(!req.userData){
+        next()
+        return
+    }
     votes.getUserVoteByPostIdQuery(req.userData.id, req.params.id)
         .then(data => {
+            if(data.rows.length == 0){
+                next()
+                return
+            }
             res.status(200).json({
                 error: false,
                 message: 'Fetch user vote successfully',
@@ -40,7 +48,13 @@ exports.deleteVote = (req, res, next) => {
 
 exports.addVote = (req,res,next)=>{
 
-    votes.addVoteQuery(req.userData.id, req.body)
+    if(req.deleteVote || req.updateVote){
+  
+        next()
+        return
+    }
+
+    return votes.addVoteQuery(req.userData.id,req.params.id, req.body)
     .then(data => {
         res.status(201).json({
             error: false,
@@ -49,4 +63,21 @@ exports.addVote = (req,res,next)=>{
         })
     })
     .catch(err => next(new CustomError(502, err)))
+}
+
+exports.updateVote = (req,res,next)=>{
+    if(req.deleteVote){
+        next()
+        return
+    }
+    
+    return votes.updateVoteQuery(req.userData.id,req.params.id, req.body)
+    .then(data => {
+        res.status(200).json({
+            error:false,
+            message: 'Update vote successfully',
+            data: data.rows[0]
+        })
+    })
+    .catch(err => next(new CustomError(500, err)))
 }
