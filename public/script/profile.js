@@ -17,6 +17,11 @@ fetch(`/users${userId}`)
     })
 
 function renderUser(user) {
+
+    const userprofile = document.createElement('a')
+    userprofile.setAttribute('href',`./profile.html?id=${user.id}`)
+
+
     const userDiv = document.createElement('div')
     userDiv.classList.add('d-flex')
     userDiv.classList.add('align-items-center')
@@ -34,8 +39,9 @@ function renderUser(user) {
 
     userDiv.appendChild(userImg)
     userDiv.appendChild(userName)
+    userprofile.appendChild(userDiv)
 
-    return userDiv
+    return userprofile
 }
 
 function renderPost(post) {
@@ -125,11 +131,7 @@ function renderPost(post) {
 
     const votesCount = document.createElement('p')
 
-    fetch(`/votes${post.id}`)
-        .then(data => data.json())
-        .then(data => {
-            votesCount.textContent = data.data.sum == null ? 0 : data.data.sum
-        })
+    
 
 
 
@@ -142,138 +144,53 @@ function renderPost(post) {
 
 
 
-    fetch(`/userVotes${post.id}`)
+    fetch(`/votes${post.id}`)
         .then(data => data.json())
         .then(data => {
-            if (data.data) {
-                if (data.data.value == 1) {
-                    votedUp = true
-                    voteUpSpan.innerHTML = ''
-                    voteUpSpan.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>'
-
-                    voteUpSpan.addEventListener('click', () => {
-                        fetch(`/votes${post.id}`, {
-                            method: 'DELETE'
-                        })
-                            .then(data => {
-                                window.location.reload()
-                                // votesCount.textContent--
-                                // voteUpSpan.innerHTML = ''
-                                // voteUpSpan.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>'
-                            })
-                    })
-
-                    voteDownSpan.addEventListener('click', () => {
-                        fetch(`/votes${post.id}`, {
-                            method: 'DELETE'
-                        })
-                            .then(data => {
-                                // votesCount.textContent--
-                                // voteUpSpan.innerHTML = ''
-                                // voteUpSpan.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>'
-                                fetch('/votes', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        post_id: post.id,
-                                        value: -1
-                                    })
-                                }).then(data => {
-                                    window.location.reload()
-                                    // votesCount.textContent--
-                                    // voteDownSpan.innerHTML = ''
-                                    // voteDownSpan.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>'
-                                })
-                            })
-                    })
-                } else if (data.data.value == -1) {
-                    votedDown = true
-                    voteDownSpan.innerHTML = ''
-                    voteDownSpan.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>'
-
-                    voteDownSpan.addEventListener('click', () => {
-                        fetch(`/votes${post.id}`, {
-                            method: 'DELETE'
-                        })
-                            .then(data => {
-                                window.location.reload()
-                                // votesCount.textContent++
-                                // voteDownSpan.innerHTML = ''
-                                // voteDownSpan.innerHTML = '<i class="fa-regular fa-thumbs-down"></i>'
-                            })
-                    })
-
-                    voteUpSpan.addEventListener('click', () => {
-                        fetch(`/votes${post.id}`, {
-                            method: 'DELETE'
-                        })
-                            .then(data => {
-                                // votesCount.textContent--
-                                // voteUpSpan.innerHTML = ''
-                                // voteUpSpan.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>'
-                                fetch('/votes', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        post_id: post.id,
-                                        value: 1
-                                    })
-                                }).then(data => {
-                                    window.location.reload()
-                                    // votesCount.textContent--
-                                    // voteDownSpan.innerHTML = ''
-                                    // voteDownSpan.innerHTML = '<i class="fa-solid fa-thumbs-down"></i>'
-                                })
-                            })
-                    })
-
-
-                }
-            } else {
-                voteUpSpan.addEventListener('click', () => {
-                    fetch('/votes', {
-                        method: 'POST',
-                        headers: {
-                            'Content-type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            post_id: post.id,
-                            value: 1
-                        })
-                    }).then(data => {
-                        window.location.reload()
-                        // votesCount.textContent++
-                        // window.location.reload()
-                        // voteUpSpan.innerHtml = ''
-                        // voteUpSpan.innerHtml = '<i class="fa-solid fa-thumbs-up"></i>'
-                    })
-                })
-
-                voteDownSpan.addEventListener('click', () => {
-                    fetch('/votes', {
-                        method: 'POST',
-                        headers: {
-                            'Content-type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            post_id: post.id,
-                            value: -1
-                        })
-                    }).then(data => {
-                        window.location.reload()
-                        // votesCount.textContent++
-                        // window.location.reload()
-                        // voteUpSpan.innerHtml = ''
-                        // voteUpSpan.innerHtml = '<i class="fa-solid fa-thumbs-up"></i>'
-                    })
-                })
-            }
-
+            votesCount.textContent = data.data.total_sum == null ? 0 : data.data.total_sum
+            voteUpSpan.innerHTML = data.data.user_vote == 1 ? '<i class="fa-solid fa-thumbs-up"></i>' : '<i class="fa-regular fa-thumbs-up"></i>'
+            voteDownSpan.innerHTML = data.data.user_vote == -1 ? '<i class="fa-solid fa-thumbs-down"></i>' : '<i class="fa-regular fa-thumbs-down"></i>'
         })
+
+
+    voteUpSpan.addEventListener('click', () => {
+        fetch(`/votes${post.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                value: 1
+            })
+        })
+            .then(data => data.json())
+            .then(data => {
+                votesCount.textContent = data.data.total_sum == null ? 0 : data.data.total_sum
+                voteUpSpan.innerHTML = data.data.user_vote == 1 ? '<i class="fa-solid fa-thumbs-up"></i>' : '<i class="fa-regular fa-thumbs-up"></i>'
+                voteDownSpan.innerHTML = data.data.user_vote == -1 ? '<i class="fa-solid fa-thumbs-down"></i>' : '<i class="fa-regular fa-thumbs-down"></i>'
+            })
+            .catch(err => alert('You need to login'))
+    })
+
+    voteDownSpan.addEventListener('click', () => {
+        fetch(`/votes${post.id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                value: -1
+            })
+        })
+            .then(data => data.json())
+            .then(data => {
+                votesCount.textContent = data.data.total_sum == null ? 0 : data.data.total_sum
+                voteUpSpan.innerHTML = data.data.user_vote == 1 ? '<i class="fa-solid fa-thumbs-up"></i>' : '<i class="fa-regular fa-thumbs-up"></i>'
+                voteDownSpan.innerHTML = data.data.user_vote == -1 ? '<i class="fa-solid fa-thumbs-down"></i>' : '<i class="fa-regular fa-thumbs-down"></i>'
+            })
+            .catch(err => alert('You need to login'))
+    })
+
 
 
 
